@@ -10,20 +10,19 @@ use App\Http\Requests\TaskRequest;
 class TaskController extends Controller
 {
 
-    public function __construct()
-    {
-    $this->middleware('auth');
-    }
-    
+    // public function __construct()
+    // {
+    // $this->middleware('auth');
+    // }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-       $tasks = Task::all();
-
+        $tasks = Task::all();
         return view('tasks.index',compact('tasks'));
     }
 
@@ -60,7 +59,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        dd($task);
+
         return view('tasks.show', compact('task'));
     }
 
@@ -100,4 +99,6 @@ class TaskController extends Controller
        $task->delete();
         return redirect()->route('task.index')->with('message', 'item has been deleted successfully') ;
     }
+
+
 }

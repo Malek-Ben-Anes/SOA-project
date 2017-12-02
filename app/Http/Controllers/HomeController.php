@@ -3,6 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Project;
+use App\Enterprise;
+use URL;
+use App\User;
+use App\Notification;
+use App\Message;
 
 class HomeController extends Controller
 {
@@ -11,10 +18,10 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
 
     /**
      * Show the application dashboard.
@@ -23,6 +30,17 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+
+        
+        $projects = Project::paginate(4);
+        foreach($projects as $project){
+             
+           $project->complete_data();
+
+        
+
+        }
+        
+        return view('home',compact('projects', 'challenges') );
     }
 }
