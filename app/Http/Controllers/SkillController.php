@@ -6,12 +6,12 @@ use App\Skill;
 use Illuminate\Http\Request;
 use App\Http\Requests\SkillRequest;
 use App\Freelancer;
+use App\User;
+use App\Project;
 use Illuminate\Support\Facades\Auth;
 
-class SkillController extends Controller
-{
-   
-   // public function __construct()
+class SkillController extends Controller {
+    // public function __construct()
     // {
     // $this->middleware('auth');
     // }
@@ -21,10 +21,9 @@ class SkillController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $skills = Skill::all();
-        return view('skills.index',compact('skills'));
+        return view('skills.index', compact('skills'));
     }
 
     /**
@@ -32,8 +31,7 @@ class SkillController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
 
         return view('skills.create');
     }
@@ -44,12 +42,10 @@ class SkillController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store( Request $request)
-    {
+    public function store(Request $request) {
         //some validation
         Skill::create($request->all());
         return redirect()->route('skill.index')->with('message', 'item has been added successfully');
-
     }
 
     /**
@@ -58,8 +54,7 @@ class SkillController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Skill $skill)
-    {
+    public function show(Skill $skill) {
 
         return view('skills.show', compact('skill'));
     }
@@ -70,9 +65,8 @@ class SkillController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Skill $skill)
-    {
-                return view('skills.edit', compact('skill'));
+    public function edit(Skill $skill) {
+        return view('skills.edit', compact('skill'));
     }
 
     /**
@@ -82,8 +76,7 @@ class SkillController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update( Request $request, Skill $skill)
-    {
+    public function update(Request $request, Skill $skill) {
         $skill->update($request->all());
         return redirect()->route('skill.index')->with('message', 'item has been updated successfully');
     }
@@ -94,76 +87,137 @@ class SkillController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Skill $skill)
-    {
+    public function destroy(Skill $skill) {
 
-       $skill->delete();
-        return redirect()->route('skill.index')->with('message', 'item has been deleted successfully') ;
+        $skill->delete();
+        return redirect()->route('skill.index')->with('message', 'item has been deleted successfully');
+    }
+
+    public function getAllSkills() {
+
+        $skills = Skill::all();
+
+        $response = array("status" => true,
+            "data" => $skills);
+
+        return response()->json($response, 200);
     }
 
 
-    public function getAllSkills(){
+    public function getAllSkillsByName( $skill_name ) {
 
-    	$skills = Skill::all();
-              
-                $response=array("status"=>true,
-                    "data"=>$skills);
-           
-            return response()->json($response,200);
+         try {
 
-    }
+        $skills = Skill::all();
 
-    public function searchForFreelancerBySkills(    $skill_name     ){
+        $response = array("status" => true,
+            "data" => $skills);
 
-        $skill = Skill::where("title","=",$skill_name)->First();
-        $freelancers = $skill->freelancers()->get()->unique('freelancer_id') ;
-                $response=array("status"=>true,
-                    "data"=>$freelancers);
-            return response()->json($response,200);
-
+                return response()->json($response, 200);
+            
+        } catch (\Exception $e) {
+            $response = array("status" => false,
+                "error" => $e->getMessage());
+            return response()->json($response, 200);
+        }
     }
 
 
+    public function searchForFreelancerBySkills($skill_name) {
 
-	public function addFreelancerSkill( $skill_id ){
+        try {
 
-        if(  Auth::guest()){
+            $skill = Skill::where("title", "=", $skill_name)->First();
+            if ($skill == null) {
+                $response = array("status" => true,
+                    "data" => []);
+                return response()->json($response, 200);
+            }
+            $freelancers = $skill->freelancers()->get()->unique('freelancer_id');
 
-            $response=array("status"=>false,
-                "error"=>"unauthorized");
-        }else{
+            foreach ($freelancers as $freelancer) {
 
-            $freelancer = Freelancer::find( Auth::user()->user_id   );
+                $freelancer->email = User::findOrFail($freelancer->freelancer_id)->email;
+                $freelancer->image = '/uploads/freelancer/images/' . ($freelancer->image == null ? 'flancer.png' : $freelancer->image);
+                $freelancer->freelancer_curriculum_vitae = '/uploads/freelancer/freelancer_curriculum_vitae/FLANCER-CV.pdf'; // . $freelancer->freelancer_curriculum_vitae ;
+            }
+            $response = array("status" => true,
+                "data" => $freelancers);
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response = array("status" => false,
+                "error" => $e->getMessage());
+            return response()->json($response, 200);
+        }
+    }
+
+    public function addFreelancerSkill($skill_id) {
+
+        if (Auth::guest()) {
+
+            $response = array("status" => false,
+                "error" => "unauthorized");
+        } else {
+
+            $freelancer = Freelancer::find(Auth::user()->user_id);
             $freelancer->skills()->attach($skill_id);
             $data['code'] = 201;
-                $data['message'] = "skill added with success";
+            $data['message'] = "skill added with success";
 
-                $response=array("status"=>true,
-                    "data"=> $data);
+            $response = array("status" => true,
+                "data" => $data);
         }
-        return response()->json($response,200);
+        return response()->json($response, 200);
     }
 
-    public function deleteFreelancerSkill( $skill_id ){
+    public function deleteFreelancerSkill($skill_id) {
 
-        if(  Auth::guest()){
+        if (Auth::guest()) {
 
-            $response=array("status"=>false,
-                "error"=>"unauthorized");
-        }else{
+            $response = array("status" => false,
+                "error" => "unauthorized");
+        } else {
 
-            $freelancer = Freelancer::find( Auth::user()->user_id   );
+            $freelancer = Freelancer::find(Auth::user()->user_id);
             $freelancer->skills()->detach($skill_id);
             $data['code'] = 201;
-                $data['message'] = "skill deleted with success";
+            $data['message'] = "skill deleted with success";
 
-                $response=array("status"=>true,
-                    "data"=> $data);
+            $response = array("status" => true,
+                "data" => $data);
         }
-        return response()->json($response,200);
+        return response()->json($response, 200);
     }
 
 
+    public function addProjectSkill( $project_id, $skill_id) {
+        if (Auth::guest()) {
+            $response = array("status" => false,
+                "error" => "unauthorized");
+        } else {
+            $project = Project::find($project_id);
+            $project->skills()->attach($skill_id);
+            $data['code'] = 201;
+            $data['message'] = "project skill added with success";
+            $response = array("status" => true,
+                "data" => $data);
+        }
+        return response()->json($response, 200);
+    }
 
+    public function deleteProjectSkill( $project_id, $skill_id) {
+
+        if (Auth::guest()) {
+            $response = array("status" => false,
+                "error" => "unauthorized");
+        } else {
+            $project = Project::find(52);
+            $project->skills()->detach($skill_id);
+            $data['code'] = 201;
+            $data['message'] = "project skill deleted with success";
+            $response = array("status" => true,
+                "data" => $data);
+        }
+        return response()->json($response, 200);
+    }
 }
-

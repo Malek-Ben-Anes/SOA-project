@@ -6,10 +6,7 @@ use App\Task;
 use Illuminate\Http\Request;
 use App\Http\Requests\TaskRequest;
 
-
-class TaskController extends Controller
-{
-
+class TaskController extends Controller {
     // public function __construct()
     // {
     // $this->middleware('auth');
@@ -20,10 +17,9 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $tasks = Task::all();
-        return view('tasks.index',compact('tasks'));
+        return view('tasks.index', compact('tasks'));
     }
 
     /**
@@ -31,8 +27,7 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
 
         return view('tasks.create');
     }
@@ -43,12 +38,10 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(TaskRequest $request)
-    {
+    public function store(TaskRequest $request) {
         //some validation
         Task::create($request->all());
         return redirect()->route('task.index')->with('message', 'item has been added successfully');
-
     }
 
     /**
@@ -57,8 +50,7 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Task $task)
-    {
+    public function show(Task $task) {
 
         return view('tasks.show', compact('task'));
     }
@@ -69,9 +61,8 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Task $task)
-    {
-                return view('tasks.edit', compact('task'));
+    public function edit(Task $task) {
+        return view('tasks.edit', compact('task'));
     }
 
     /**
@@ -81,8 +72,7 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(TaskRequest $request, Task $task)
-    {
+    public function update(TaskRequest $request, Task $task) {
         $task->update($request->all());
         return redirect()->route('task.index')->with('message', 'item has been updated successfully');
     }
@@ -93,12 +83,10 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Task $task)
-    {
+    public function destroy(Task $task) {
 
-       $task->delete();
-        return redirect()->route('task.index')->with('message', 'item has been deleted successfully') ;
+        $task->delete();
+        return redirect()->route('task.index')->with('message', 'item has been deleted successfully');
     }
-
 
 }

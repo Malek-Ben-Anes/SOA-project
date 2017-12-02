@@ -13,8 +13,6 @@ class CreateChallengesTable extends Migration {
 			$table->string('title')->nullable();
 			$table->text('description')->nullable();
 			$table->string('challenge_document')->nullable();
-			$table->datetime('start_date');
-			$table->datetime('end_date');
 			$table->integer('winner_number')->nullable();
 			$table->timestamps();
 		});

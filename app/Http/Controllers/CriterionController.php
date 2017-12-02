@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Criterion;
 use Illuminate\Http\Request;
 use App\Http\Requests\CriterionRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Criterion;
 use App\Freelancer;
 use App\Challenge;
 
-class CriterionController extends Controller
-{
-   
-   // public function __construct()
+class CriterionController extends Controller {
+    // public function __construct()
     // {
     // $this->middleware('auth');
     // }
@@ -22,10 +20,10 @@ class CriterionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
-        $criterions = Criterion::all();
-        return view('criterions.index',compact('criterions'));
+    public function index(Request $request) {
+        $challenge = Challenge::find($request->challenge_id);
+        $criterions = $challenge->criterions()->get()->all();
+        return view('criterions.index', compact('criterions', 'challenge'));
     }
 
     /**
@@ -33,8 +31,7 @@ class CriterionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
 
         return view('criterions.create');
     }
@@ -45,12 +42,11 @@ class CriterionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store( Request $request)
-    {
+    public function store(Request $request) {
         //some validation
+        // return $request->all();
         Criterion::create($request->all());
-        return redirect()->route('criterion.index')->with('message', 'item has been added successfully');
-
+        return back()->with('message', 'criterion has been added successfully');
     }
 
     /**
@@ -59,8 +55,7 @@ class CriterionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Criterion $criterion)
-    {
+    public function show(Criterion $criterion) {
 
         return view('criterions.show', compact('criterion'));
     }
@@ -71,20 +66,18 @@ class CriterionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function showByChallenge($challenge_id)
-    {
+    public function showByChallenge($challenge_id) {
 
-         if(  Auth::guest()){
-            $response=array("status"=>false,
-                "error"=>"unauthorized");
-        }else{
+        if (Auth::guest()) {
+            $response = array("status" => false,
+                "error" => "unauthorized");
+        } else {
 
-        $freelancer = Freelancer::find(Auth::user()->user_id);
-        $criterions =$freelancer->criterions()->where('challenge_id','=',$challenge_id)->get() ;
-        return view('criterions.indexWithMark', compact('criterions'));
+            $freelancer = Freelancer::find(Auth::user()->user_id);
+            $criterions = $freelancer->criterions()->where('challenge_id', '=', $challenge_id)->get();
+            return view('criterions.indexWithMark', compact('criterions'));
         }
     }
-
 
     /**
      * Show the form for editing the specified resource.
@@ -92,9 +85,8 @@ class CriterionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Criterion $criterion)
-    {
-                return view('criterions.edit', compact('criterion'));
+    public function edit(Criterion $criterion) {
+        return view('criterions.edit', compact('criterion'));
     }
 
     /**
@@ -104,10 +96,10 @@ class CriterionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update( Request $request, Criterion $criterion)
-    {
-        $criterion->update($request->all());
-        return redirect()->route('criterion.index')->with('message', 'item has been updated successfully');
+    public function update(Request $request, Criterion $criterion) {
+        // dd($criterion);
+        $criterion->update(['title' => $request->title]);
+        return back()->with('message', 'criterion has been updated successfully');
     }
 
     /**
@@ -116,40 +108,29 @@ class CriterionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Criterion $criterion)
-    {
+    public function destroy(Criterion $criterion) {
 
-       $criterion->delete();
-        return redirect()->route('criterion.index')->with('message', 'item has been deleted successfully') ;
+        $criterion->delete();
+        return back()->with('message', 'item has been deleted successfully');
     }
 
+    public function getAllCriterions() {
 
-    public function getAllCriterions(){
+        $criterions = Criterion::all();
 
-    	$criterions = Criterion::all();
-              
-                $response=array("status"=>true,
-                    "data"=>$criterions);
-           
-            return response()->json($response,200);
+        $response = array("status" => true,
+            "data" => $criterions);
 
+        return response()->json($response, 200);
     }
 
-    public function searchForFreelancerByCriterions(    $criterion_name     ){
+    public function searchForFreelancerByCriterions($criterion_name) {
 
-        $criterion = Criterion::where("title","=",$criterion_name)->First();
-        $freelancers = $criterion->freelancers()->get()->unique('freelancer_id') ;
-                $response=array("status"=>true,
-                    "data"=>$freelancers);
-            return response()->json($response,200);
-
+        $criterion = Criterion::where("title", "=", $criterion_name)->First();
+        $freelancers = $criterion->freelancers()->get()->unique('freelancer_id');
+        $response = array("status" => true,
+            "data" => $freelancers);
+        return response()->json($response, 200);
     }
-
-
-
-	
-
-
 
 }
-

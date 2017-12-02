@@ -12,8 +12,10 @@ class CreateProjectsTable extends Migration {
 			$table->integer('enterprise_id')->unsigned();
 			$table->string('title', 50);
 			$table->text('description');
-			$table->integer('duration')->unsigned();
+			$table->float('budget');
+			$table->datetime('ending_date') ;
 			$table->boolean('open')->default(true);
+			$table->boolean('sponsored')->default(false);
 			$table->timestamps();
 		});
 	}

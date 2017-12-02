@@ -4,15 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ChallengeUpdateRequest extends FormRequest
-{
+class ChallengeUpdateRequest extends FormRequest {
+
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
-    {
+    public function authorize() {
         return true;
     }
 
@@ -21,14 +20,11 @@ class ChallengeUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             'title' => 'required',
             'description' => 'required',
-            'duration' => 'required',
-            'enterprise_id' => 'required',
-            'challenge update' => 'required',
         ];
     }
+
 }

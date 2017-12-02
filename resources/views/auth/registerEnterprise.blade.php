@@ -84,7 +84,7 @@
 
 
                         <div class="form-group">
-                            <label for="attach_document" class="col-md-4 control-label">Attach Resume:</label>
+                            <label for="attach_document" class="col-md-4 control-label">Attach Document:</label>
                             <div class="col-md-6">
                                {{ Form::file('attach_document')  }}
                                 <span class="required" id='spnFileError'></span>

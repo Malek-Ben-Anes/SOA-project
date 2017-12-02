@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
+use App\User;
 
-class UserController extends Controller
-{
+class UserController extends Controller {
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index() {
         $users = User::all();
         return $users;
     }
@@ -23,8 +23,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
         //
     }
 
@@ -34,8 +33,7 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         //
     }
 
@@ -45,8 +43,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id) {
         //
     }
 
@@ -56,8 +53,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id) {
         //
     }
 
@@ -68,8 +64,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
-    {
+    public function update(Request $request, User $user) {
         $user->update($request->all());
         return redirect()->route('task.index')->with('message', 'user has been updated successfully');
     }
@@ -80,47 +75,51 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
         //
     }
 
-
-
-
-
-    public function getUserByMail($email){
-
-   }
-
-
-   
-
-
-  public function getById($id)
-    {
-        dd(DB::table('users')->where('user_id', $id));
-        return $user->username;
-
+    public function getUserByMail($email) {
+        
     }
 
-    public function getByMail($email)
-    {
+    public function getById($id) {
+        dd(DB::table('users')->where('user_id', $id));
+        return $user->username;
+    }
+
+    public function getByMail($email) {
         dd(DB::table('users')->where('email', $email));
         return $user->username;
-
     }
 
     /**
      * Show the profile for the given user.
      */
-    public function showProfile($id)
-    {
+    public function showProfile($id) {
         $user = User::find($id);
 
         return View::make('user.profile', array('user' => $user));
     }
 
-   
+    /**
+     * Send a comment in the project interface.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function sendComment(Request $request) {
+        try {
+
+            User::findOrFail($request->user_id)->comments()->attach($request->project_id, ['content' => $request->content]);
+            $response = array("status" => true,
+                "data" => "comment is successfully sended");
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response = array("status" => false,
+                "error" => $e->getMessage());
+            return response()->json($response, 200);
+        }
+    }
 
 }

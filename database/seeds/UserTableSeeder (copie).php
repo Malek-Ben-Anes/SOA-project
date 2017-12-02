@@ -11,12 +11,10 @@ class UserTableSeeder extends Seeder {
 		for($i = 0; $i < 10; ++$i)
 		{
 			DB::table('users')->insert([
-				'username' => 'Nom' . $i,
+				'username' => 'username' . $i,
 				'email' => 'email' . $i . '@blop.fr',
 				'password' => bcrypt('password'),
-				'country' => 'tunis',
-				'city' => 'tunis',
-				'address' => 'odc',
+				'address' => 'Rue du Lac Biwa, Tunis, Tunisie',
 				'type' => 'freelancer'
 			]);
 		}

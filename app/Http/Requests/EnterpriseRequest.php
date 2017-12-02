@@ -4,15 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class EnterpriseRequest extends FormRequest
-{
+class EnterpriseRequest extends FormRequest {
+
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
-    {
+    public function authorize() {
         return true;
     }
 
@@ -21,13 +20,14 @@ class EnterpriseRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules() {
         return [
-                'enterprise_name' => 'required',       
-                'phone' => 'required',
-                'enterprise_document' => 'required',
-                'logo' => 'required'
-             ];
+            'enterprise_name' => 'required',
+            'phone' => 'required',
+            'address' => 'required',
+            'description' => 'required',
+            'enterprise_document' => 'required|mimes:doc,pdf,docx,zip,png,jpg',
+        ];
     }
+
 }

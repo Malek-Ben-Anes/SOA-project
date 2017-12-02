@@ -7,27 +7,26 @@ use Illuminate\Http\Request;
 use File;
 use Input;
 
-class UploadedFile extends Model
-{
+class UploadedFile extends Model {
+
     // this model is essentially for validation files
     // 
     // 
     // return true if file is correctly uploaded 
     // false if file is not uploaded
-    
-    public function validate( $file ){
+
+    public function validate($file) {
 
 
-    	 if ( $file  == null) {
-    	 	return false;
-        }else{
+        if ($file == null) {
+            return false;
+        } else {
             if ($file->isValid()) {
-				return true;              
-            }else{
-    	 		return false;
+                return true;
+            } else {
+                return false;
             }
         }
-
     }
 
     // this model is essentially for uploading  files
@@ -35,15 +34,15 @@ class UploadedFile extends Model
     // 
     // return true if file is correctly uploaded 
     // false if file is not uploaded
-	public function uploadFile($user, $file, $destination){
+    public function uploadFile($user, $file, $destination) {
 
-		$file = Input::file('image');
-                $random_name = str_random(20);
-                $extension = $file->getClientOriginalExtension();
-                $filename=   $random_name .'.' .$extension;
-                $file->move($destinationPath, $filename) ;
+        $file = Input::file('image');
+        $random_name = str_random(20);
+        $extension = $file->getClientOriginalExtension();
+        $filename = $random_name . '.' . $extension;
+        $file->move($destinationPath, $filename);
 
-                $data ['image'] = $filename;
+        $data ['image'] = $filename;
+    }
 
-	}
 }
